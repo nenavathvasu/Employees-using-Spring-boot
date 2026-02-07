@@ -1,0 +1,65 @@
+package com.sathya.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import com.sathya.Exception.EmployeeNotFoundException;
+import com.sathya.Model.Employee;
+import com.sathya.Repository.EmployeeRepository;
+
+@Service
+public class EmployeeService {
+
+    @Autowired
+    private EmployeeRepository repository;
+
+    // Save Employee with Salary Calculation
+    public Employee saveEmployee(Employee emp) {
+
+        double basicSalary = emp.getSalary();
+
+        double hra = basicSalary * 0.30;
+        double da  = basicSalary * 0.05;
+        double pf  = basicSalary * 0.04;
+
+        double newSalary = basicSalary + hra + da - pf;
+
+        emp.setSalary(newSalary);
+
+        return repository.save(emp);
+    }
+
+    // Get All Employees
+    public List<Employee> getAllEmployees() {
+        return repository.findAll();
+    }
+
+    // Get Employee By ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+
+        Employee employee = EmployeeService.getEmployeeById(id);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header("info", "Data retrieved successfully")
+                .body(employee);
+    }
+
+    // Delete Employee
+    public void deleteEmployee(Long id) {
+        repository.deleteById(id);
+    }
+
+    //save bulk
+	public static List<Employee> saveAll(Employee employee) {
+		EmployeeRepository.save(employee);
+		return null;
+	}
+}

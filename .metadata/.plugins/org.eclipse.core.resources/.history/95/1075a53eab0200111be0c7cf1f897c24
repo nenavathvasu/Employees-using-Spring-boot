@@ -1,0 +1,25 @@
+package com.sathya.controller;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.sathya.Model.Employee;
+import com.sathya.Service.EmployeeService;
+
+@RestController
+@RequestMapping("/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeService service;
+
+    @PostMapping
+    public Employee saveEmployee(@RequestBody Employee emp) {
+        return service.saveEmployee(emp);
+    }
+
+    
+}

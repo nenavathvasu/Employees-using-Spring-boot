@@ -1,0 +1,6 @@
+package com.sathya.Service;
+
+@RestSer
+public class EmployeeService {
+
+}

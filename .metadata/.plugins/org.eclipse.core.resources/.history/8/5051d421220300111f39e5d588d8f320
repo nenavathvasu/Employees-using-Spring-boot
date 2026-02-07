@@ -1,0 +1,42 @@
+package com.sathya.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.sathya.Model.Employee;
+import com.sathya.Service.EmployeeService;
+
+@RestController
+@RequestMapping("/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeService service;
+
+    // Save single employee
+    @PostMapping
+    public Employee saveEmployee(@RequestBody Employee emp) {
+        return service.saveEmployee(emp);
+    }
+
+    // Get employee by id
+    @GetMapping("/{id}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+
+        Employee employee = service.getEmployeeById(id);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header("info", "Data retrieved successfully")
+                .body(employee);
+    }
+
+    // Delete employee
+    @DeleteMapping("/{id}")
+    public String deleteEmployee(@PathVariable Long id) {
+        service.deleteEmployee(id);
+        return "Employee deleted successfully";
+    }
+}
