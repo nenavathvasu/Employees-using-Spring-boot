@@ -71,4 +71,33 @@ public class EmployeeService {
     }
 
 	
+    public Employee updateEmployee(Long id, Employee newEmp) {
+        Employee emp = repository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+
+        emp.setName(newEmp.getName());
+        emp.setDepartment(newEmp.getDepartment());
+        emp.setSalary(newEmp.getSalary());
+
+        return repository.save(emp);
+    }
+
+    
+    public Employee partialUpdate(Long id, Employee newEmp) {
+        Employee emp = repository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+
+        if (newEmp.getName() != null) {
+            emp.setName(newEmp.getName());
+        }
+        if (newEmp.getDepartment() != null) {
+            emp.setDepartment(newEmp.getDepartment());
+        }
+        if (newEmp.getSalary() != 0) {
+            emp.setSalary(newEmp.getSalary());
+        }
+
+        return repository.save(emp);
+    }
+
 }

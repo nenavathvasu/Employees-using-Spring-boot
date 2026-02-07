@@ -71,5 +71,24 @@ public class EmployeeController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployee(
+            @PathVariable Long id,
+            @RequestBody Employee employee) {
+
+        Employee updated = service.updateEmployee(id, employee);
+        return ResponseEntity.ok(updated);
+    }
+
+    
+    @PatchMapping("/{id}")
+    public ResponseEntity<Employee> partialUpdate(
+            @PathVariable Long id,
+            @RequestBody Employee employee) {
+
+        Employee updated = service.partialUpdate(id, employee);
+        return ResponseEntity.ok(updated);
+    }
+
 
 }

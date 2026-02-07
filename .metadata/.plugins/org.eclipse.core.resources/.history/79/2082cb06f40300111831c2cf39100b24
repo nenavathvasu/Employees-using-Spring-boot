@@ -1,0 +1,85 @@
+package com.sathya.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.sathya.Exception.EmployeeNotFoundException;
+import com.sathya.Model.Employee;
+import com.sathya.Repository.EmployeeRepository;
+
+@Service
+public class EmployeeService {
+
+    @Autowired
+    private EmployeeRepository repository;
+
+    // Save Employee with Salary Calculation
+    public Employee saveEmployee(Employee emp) {
+        double basicSalary = emp.getSalary();
+        double hra = basicSalary * 0.30;
+        double da  = basicSalary * 0.05;
+        double pf  = basicSalary * 0.04;
+        double newSalary = basicSalary + hra + da - pf;
+        emp.setSalary(newSalary);
+        return repository.save(emp);
+    }
+    
+    //save all employees 
+    public List<Employee> SaveAllEmployee(List<Employee> emp) {	
+		return repository.saveAll(emp);
+	}
+
+    // Get All Employees
+    public List<Employee> getAllEmployees() {
+        return repository.findAll();
+    }
+
+    // Get Employee By ID
+    public Employee getEmployeeById(Long id) {
+        Optional<Employee> optemps = repository.findById(id);
+        if (optemps.isPresent()) {
+            return optemps.get();
+        } else {
+            throw new EmployeeNotFoundException(
+                    "Employeee is not available " + id
+            );
+        }
+    }
+    // Delete Employee
+    public void deleteEmployeeById(Long id) {
+    	if(repository.existsById(id)) {
+    		repository.deleteById(id);
+    	}
+    	else {
+    		throw new EmployeeNotFoundException("Employee Not Found"+id);
+    	}
+    }
+
+    //delete All employee
+    public void deleteAllEmployees() {
+
+        long count = repository.count();
+
+        if (count == 0) {
+            throw new EmployeeNotFoundException("No employees present to delete");
+        }
+
+        repository.deleteAll();
+    }
+
+	
+    public Employee updateEmployee(Long id, Employee newEmp) {
+        Employee emp = repository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found"));
+
+        emp.setName(newEmp.getName());
+        emp.setDepartment(newEmp.getDepartment());
+        emp.setSalary(newEmp.getSalary());
+
+        return repository.save(emp);
+    }
+
+}
