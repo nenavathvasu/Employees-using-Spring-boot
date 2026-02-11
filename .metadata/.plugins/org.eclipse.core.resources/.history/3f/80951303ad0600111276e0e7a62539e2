@@ -1,0 +1,192 @@
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sathya.Model.Employee;
+import com.sathya.Service.EmployeeService;
+
+@RestController
+@RequestMapping("/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeService service;
+
+    // ================= SAVE =================
+    @PostMapping("/save")
+    public ResponseEntity<Employee> saveEmployee(@RequestBody Employee emp) {
+        Employee saved = service.saveEmployee(emp);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .header("info", "Employee saved successfully")
+                .body(saved);
+    }
+
+    @PostMapping("/saveAll")
+    public ResponseEntity<List<Employee>> saveAll(@RequestBody List<Employee> emp) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .header("info", "All employees saved successfully")
+                .body(service.SaveAllEmployee(emp));
+    }
+
+    // ================= HATEOAS =================
+    @GetMapping("/{id}")
+    public ResponseEntity<EntityModel<Employee>> getEmployeeByIdHateoas(@PathVariable Long id) {
+
+        Employee employee = service.getEmployeeById(id);
+
+        EntityModel<Employee> model = EntityModel.of(employee);
+        model.add(linkTo(methodOn(EmployeeController.class)
+                .getEmployeeByIdHateoas(id)).withSelfRel());
+        model.add(linkTo(methodOn(EmployeeController.class)
+                .deleteEmployeeById(id)).withRel("delete"));
+        model.add(linkTo(methodOn(EmployeeController.class)
+                .updateEmployee(id, employee)).withRel("update"));
+        model.add(linkTo(methodOn(EmployeeController.class)
+                .getAllEmp()).withRel("getAll"));
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employee fetched successfully")
+                .body(model);
+    }
+
+    // ================= GET =================
+    @GetMapping
+    public ResponseEntity<List<Employee>> getAllEmp() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "All employees fetched successfully")
+                .body(service.getAllEmployees());
+    }
+
+    // ================= DELETE =================
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteEmployeeById(@PathVariable Long id) {
+        service.deleteEmployeeById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .header("info", "Employee deleted successfully")
+                .body("Employee deleted with id " + id);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteAllEmployees() {
+        service.deleteAllEmployees();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .header("info", "All employees deleted successfully")
+                .body("All employees deleted");
+    }
+
+    // ================= UPDATE =================
+    @PutMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployee(
+            @PathVariable Long id,
+            @RequestBody Employee employee) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employee updated successfully")
+                .body(service.updateEmployee(id, employee));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Employee> partialUpdate(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> updates) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employee partially updated successfully")
+                .body(service.partialUpdate(id, updates));
+    }
+
+    // ================= SALARY =================
+    @GetMapping("/minsalary")
+    public ResponseEntity<List<Employee>> minSalary(@RequestParam double minsalary) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employees with minimum salary fetched")
+                .body(service.getMinSalary(minsalary));
+    }
+
+    @GetMapping("/maxsalary")
+    public ResponseEntity<List<Employee>> maxSalary(@RequestParam double maxsalary) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employees with maximum salary fetched")
+                .body(service.getMaxSalary(maxsalary));
+    }
+
+    @GetMapping("/salarybetween")
+    public ResponseEntity<List<Employee>> salaryBetween(
+            @RequestParam double min,
+            @RequestParam double max) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employees salary between range fetched")
+                .body(service.getSalaryBetween(min, max));
+    }
+
+    // ================= EMAIL =================
+    @GetMapping("/email")
+    public ResponseEntity<Employee> getByEmail(@RequestParam String email) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employee fetched by email")
+                .body(service.getByEmail(email));
+    }
+
+    // ================= GENDER & SALARY =================
+    @GetMapping("/salary-or-gender")
+    public ResponseEntity<List<Employee>> salaryOrGender(
+            @RequestParam double salary,
+            @RequestParam String gender) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employees fetched by salary OR gender")
+                .body(service.getSalaryGreaterOrGender(salary, gender));
+    }
+
+    @GetMapping("/gender-and-salary")
+    public ResponseEntity<List<Employee>> genderAndSalary(
+            @RequestParam String gender,
+            @RequestParam double minSalary) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employees fetched by gender AND salary")
+                .body(service.getGenderAndMinSalary(gender, minSalary));
+    }
+
+    @GetMapping("/gender-or-salary-between")
+    public ResponseEntity<List<Employee>> genderOrSalaryBetween(
+            @RequestParam String gender,
+            @RequestParam double min,
+            @RequestParam double max) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employees fetched by gender OR salary between")
+                .body(service.getGenderOrSalaryBetween(gender, min, max));
+    }
+
+    // ================= SORTING =================
+    @GetMapping("/salary-asc")
+    public ResponseEntity<List<Employee>> salaryAsc() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employees sorted by salary ascending")
+                .body(service.getSalaryAsc());
+    }
+
+    @GetMapping("/salary-desc")
+    public ResponseEntity<List<Employee>> salaryDesc() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employees sorted by salary descending")
+                .body(service.getSalaryDesc());
+    }
+
+    // ================= NAME =================
+    @GetMapping("/name-ignorecase")
+    public ResponseEntity<List<Employee>> nameIgnoreCase(@RequestParam String name) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employees fetched by name ignore case")
+                .body(service.getByNameIgnoreCase(name));
+    }
+
+    @GetMapping("/name-contains")
+    public ResponseEntity<List<Employee>> nameContains(@RequestParam String keyword) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Employees fetched by name containing keyword")
+                .body(service.getByNameContaining(keyword));
+    }
+}

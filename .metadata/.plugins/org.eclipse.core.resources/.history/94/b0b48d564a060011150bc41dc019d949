@@ -1,0 +1,61 @@
+package com.sathya.controller;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.sathya.Model.Employee;
+import com.sathya.Service.EmployeeService;
+
+@RestController
+@RequestMapping("/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeService service;
+
+    // Save employee (no HATEOAS needed here)
+    @PostMapping("/save")
+    public ResponseEntity<Employee> saveEmployee(@RequestBody Employee emp) {
+        Employee saved = service.saveEmployee(emp);
+        return ResponseEntity.ok(saved);
+    }
+
+    // 🔥 GET Employee with HATEOAS (NO List, NO Collection)
+    @GetMapping("/{id}")
+    public ResponseEntity<EntityModel<Employee>> getEmployeeById(@PathVariable Long id) {
+
+        Employee employee = service.getEmployeeById(id);
+
+        EntityModel<Employee> model = EntityModel.of(employee);
+
+        model.add(linkTo(methodOn(EmployeeController.class)
+                .getEmployeeById(id)).withSelfRel());
+
+        model.add(linkTo(methodOn(EmployeeController.class)
+                .deleteEmployeeById(id)).withRel("delete"));
+
+        model.add(linkTo(methodOn(EmployeeController.class)
+                .updateEmployee(id, employee)).withRel("update"));
+
+        return ResponseEntity.ok(model);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployeeById(@PathVariable Long id) {
+        service.deleteEmployeeById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployee(
+            @PathVariable Long id,
+            @RequestBody Employee employee) {
+
+        Employee updated = service.updateEmployee(id, employee);
+        return ResponseEntity.ok(updated);
+    }
+}

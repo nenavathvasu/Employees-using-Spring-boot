@@ -1,0 +1,15 @@
+
+
+public class Snippet {
+	public ResponseEntity<List<Employee>> filterEmployees(
+	            @RequestParam String dept,
+	            @RequestParam String gender,
+	            @RequestParam double minSalary,
+	            @RequestParam double maxSalary) {
+	
+	        List<Employee> employees =
+	                service.getEmployees(dept, gender, minSalary, maxSalary);
+	
+	        return ResponseEntity.ok(employees);
+	    }
+}

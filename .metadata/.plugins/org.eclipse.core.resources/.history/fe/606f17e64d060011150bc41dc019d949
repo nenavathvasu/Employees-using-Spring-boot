@@ -1,0 +1,147 @@
+package com.sathya.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.sathya.Model.Employee;
+import com.sathya.Service.EmployeeService;
+
+
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
+
+
+
+
+@RestController
+@RequestMapping("/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeService service;
+
+    // Save single employee
+    @PostMapping("/save")
+    public ResponseEntity<Employee> saveEmployee(@RequestBody Employee emp) {
+    		Employee saveEmp = service.saveEmployee(emp);
+    	return ResponseEntity.status(HttpStatus.CREATED)
+    						.header("info", "Saved successfully")
+    						.body(saveEmp);
+    }
+    
+    //save all 
+    @PostMapping("/saveAll")
+    public ResponseEntity<List<Employee>> saveAll(@RequestBody List<Employee> emp){
+    	List<Employee> saveAll = service.SaveAllEmployee(emp);
+    	return ResponseEntity.status(HttpStatus.CREATED)
+    				.header("info", "Saved all Employees Successfully")
+    				.body(saveAll);
+    }
+    
+    
+    
+    
+
+    
+    @GetMapping()
+    public ResponseEntity<List<Employee>> getAllEmp(){
+    	List<Employee> GetAllEmployee = service.getAllEmployees();
+    	return ResponseEntity
+    			.status(HttpStatus.OK)
+    			.header("info", "Data Retriebed Successful")
+    			.body(GetAllEmployee);
+    }
+    
+    
+   
+    
+    
+
+
+    @GetMapping("/hateoas/{id}")
+    public ResponseEntity<EntityModel<Employee>> getEmployeeByIdHateoas(@PathVariable Long id){
+
+        Employee employee = service.getEmployeeById(id);
+
+        EntityModel<Employee> model = EntityModel.of(employee);
+
+        model.add(linkTo(methodOn(EmployeeController.class)
+                .getEmployeeByIdHateoas(id)).withSelfRel());
+        
+        
+        model.add(linkTo(methodOn(EmployeeController.class)
+                .deleteEmployeeById(id)).withRel("delete"));
+
+        model.add(linkTo(methodOn(EmployeeController.class)
+                .updateEmployee(id, employee)).withRel("update"));
+        
+        model.add(linkTo(methodOn(EmployeeController.class)
+        		.getAllEmp()).withRel("getAll"));
+        
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("info", "Data retrieved successfully")
+                .body(model);
+    }
+
+    
+    
+    
+    
+    // Get employee by id
+//    @GetMapping("/{id}")
+//    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+//
+//        Employee employee = service.getEmployeeById(id);
+//
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .header("info", "Data retrieved successfully")
+//                .body(employee);
+//    }
+
+    // Delete employee by id
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployeeById(@PathVariable Long id) {
+        service.deleteEmployeeById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    
+    //Delete All employees
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAllEmployees() {
+        service.deleteAllEmployees();
+        return ResponseEntity.noContent().build();
+    }
+
+    
+    
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployee(
+            @PathVariable Long id,
+            @RequestBody Employee employee) {
+
+        Employee updated = service.updateEmployee(id, employee);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Employee> partialUpdate(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> updates) {
+
+        Employee updated = service.partialUpdate(id, updates);
+        return ResponseEntity.ok(updated);
+    }
+
+
+
+}
