@@ -1,7 +1,0 @@
-package com.sathya.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import com.sathya.model.Employee;
-
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-}
