@@ -166,4 +166,21 @@ public class EmployeeController {
         return service.getEmployees(department, gender, minSalary, maxSalary);
     }
 
+ //  Delete By Email
+    @DeleteMapping("/deletebyemail")
+    public ResponseEntity<Void> deleteByEmail(@RequestParam String email) {
+        service.deleteByEmail(email);
+        return ResponseEntity.noContent().build(); // 204 No Content
+    }
+
+    // Delete By Salary Range
+    @DeleteMapping("/deletebyrange")
+    public ResponseEntity<Void> deleteBySalaryRange(
+            @RequestParam double minSalary,
+            @RequestParam double maxSalary) {
+
+        service.deleteEmployeesBetweenSalary(minSalary, maxSalary);
+
+        return ResponseEntity.noContent().build(); // 204 No Content
+    }
 }

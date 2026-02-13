@@ -144,11 +144,6 @@ public class EmployeeService {
     }
     
     
-    
-    
-    
-    
-    
  // Dept + Gender + Salary Between
     public List<Employee> getEmployees(
             String dept,
@@ -160,6 +155,72 @@ public class EmployeeService {
                 dept, gender, minSalary, maxSalary);
     }
 
+    
+ 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    //Delete by Email
+    public void deleteByEmail(String email) {
+         repository.deleteByEmail(email);
+    }
+
+    // Delete by Salary Range
+    public void deleteEmployeesBetweenSalary(double minSalary, double maxSalary) {
+        repository.deleteBySalaryRange(minSalary, maxSalary);
+    } 
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     

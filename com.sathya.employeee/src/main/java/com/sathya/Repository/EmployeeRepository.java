@@ -4,10 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.sathya.Model.Employee;
+
+import jakarta.transaction.Transactional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
@@ -32,7 +36,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> findByNameIgnoreCase(String name);
     List<Employee> findByNameContaining(String keyword);
 
-    // ✅ FIXED JPQL QUERY
+   
     @Query("""
         SELECT e FROM Employee e
         WHERE e.department = :department
@@ -45,4 +49,70 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             @Param("minSalary") double minSalary,
             @Param("maxSalary") double maxSalary
     );
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Employee e WHERE e.email = :email")
+    void deleteByEmail(@Param("email") String email);
+
+
+    // Delete By Salary Range
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Employee e WHERE e.salary BETWEEN :minSalary AND :maxSalary")
+    void deleteBySalaryRange(double minSalary, double maxSalary);
+    
+    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
